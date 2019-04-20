@@ -10,10 +10,8 @@ namespace FollowYourSelfMobile.Models
     {
         public enum ActivityTypes
         {
-            [Description("Tam Sayı")]
-            TamSayi,
-            [Description("Ondalık Sayı")]
-            OndalikSayi,
+            [Description("Sayı")]
+            Sayi,
             [Description("Yapıldı/Yapılmadı")]
             YapildiYapilmadi
         }

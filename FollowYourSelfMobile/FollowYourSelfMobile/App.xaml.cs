@@ -25,7 +25,7 @@ namespace FollowYourSelfMobile
         public static DataTemplate ActivityPageDataTemplate;
         public App()
         {
-            InitializeComponent();
+           // InitializeComponent();
             ActivityPageDataTemplate = new DataTemplate(() =>
             {
                 var textCell = new ExTextCell();

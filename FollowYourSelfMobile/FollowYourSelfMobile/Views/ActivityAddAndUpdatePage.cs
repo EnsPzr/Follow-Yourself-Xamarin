@@ -174,7 +174,7 @@ namespace FollowYourSelfMobile.Views
                             var newActivity = new Activity()
                             {
                                 ActivityName = activityNameEntry.Text,
-                                ActivityRegisterDate = DateTime.Now,
+                                ActivityRegisterDate = DateTime.Today,
                                 IsActive = true
                             };
                             newActivity.ActivityTypes =
@@ -182,6 +182,7 @@ namespace FollowYourSelfMobile.Views
                                     p.Value == activityTypesPicker.SelectedItem.ToString()).Key;
                             if (_manager.InsertActivity(newActivity) > 0)
                             {
+                                App.activityList = _manager.GetAllActivity();
                                 await DisplayAlert("Başarı", "Aktivite ekleme işlemi başarılı bir şekilde sonuçlandı.",
                                     "Tamam");
                                 await Navigation.PopAsync(true);
@@ -214,19 +215,55 @@ namespace FollowYourSelfMobile.Views
                                 && regulatedActivity.IsActive == activity.IsActive
                                 && regulatedActivity.ActivityName.Equals(activity.ActivityName))
                             {
+                                App.activityList = _manager.GetAllActivity();
                                 await DisplayAlert("Başarı", "Aktivite güncelleme işlemi tamamlandı.", "Tamam");
                                 await Navigation.PopAsync(true);
                             }
                             else
                             {
-                                if (_manager.UpdateActivity(regulatedActivity) > 0)
+                                if (regulatedActivity.ActivityTypes != activity.ActivityTypes)
                                 {
-                                    await DisplayAlert("Başarı", "Aktivite güncelleme işlemi tamamlandı.", "Tamam");
-                                    await Navigation.PopAsync(true);
+                                    var returned = await DisplayAlert("Dikkat",
+                                        "Aktivitenin türünü değiştirdiniz. Devam ederseniz bu aktivitenin geçmişe yönelik tüm" +
+                                        "verileri sıfırlanacaktır. Devam etmek istiyor musunuz?", "Devam", "İptal");
+                                    if (returned==true)
+                                    {
+                                        var listActivityStatuses =
+                                            _manager.GetAllActivityStatusesById(activity.ActivityId);
+                                        foreach (var activityState in listActivityStatuses)
+                                        {
+                                            _manager.UpdateActivityStatus(activityState.ActivityStatusId,0);
+                                        }
+
+                                        if (_manager.UpdateActivity(regulatedActivity) > 0)
+                                        {
+                                            App.activityList = _manager.GetAllActivity();
+                                            await DisplayAlert("Başarı", "Aktivite güncelleme işlemi tamamlandı.", "Tamam");
+                                            await Navigation.PopAsync(true);
+                                        }
+                                        else
+                                        {
+                                            await DisplayAlert("Hata", "Güncelleme işlemi sırasında hata oluştu.", "Tamam");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("Uyarı",
+                                            "Aktivite güncelleme işlemi kendi isteğiniz ile iptal edildi.", "Tamam");
+                                    }
                                 }
                                 else
                                 {
-                                    await DisplayAlert("Hata", "Güncelleme işlemi sırasında hata oluştu.", "Tamam");
+                                    if (_manager.UpdateActivity(regulatedActivity) > 0)
+                                    {
+                                        App.activityList = _manager.GetAllActivity();
+                                        await DisplayAlert("Başarı", "Aktivite güncelleme işlemi tamamlandı.", "Tamam");
+                                        await Navigation.PopAsync(true);
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("Hata", "Güncelleme işlemi sırasında hata oluştu.", "Tamam");
+                                    }
                                 }
                             }
                         }

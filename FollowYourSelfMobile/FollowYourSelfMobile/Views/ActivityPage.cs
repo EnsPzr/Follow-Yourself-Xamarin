@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,7 +20,10 @@ namespace FollowYourSelfMobile.Views
             Title = "Tüm Aktivitelerim";
             var mainListView = new ExListView();
             var activityIndicatorLabel = new ExLabel() { Text = "Aktiviteleriniz getiriliyor..." };
-            var activityIndicator = new ActivityIndicator();
+            var activityIndicator = new ActivityIndicator()
+            {
+                Color = Color.DarkRed
+            };
             activityIndicator.SetBinding(ActivityIndicator.IsRunningProperty, new Binding("IsBusy", source: this));
             var activityIndicatorStackLayout = new ExStackLayout()
             {
@@ -28,7 +32,7 @@ namespace FollowYourSelfMobile.Views
             };
             activityIndicatorStackLayout.Children.Add(activityIndicatorLabel);
             activityIndicatorStackLayout.Children.Add(activityIndicator);
-            activityIndicatorStackLayout.SetBinding(Grid.IsVisibleProperty, new Binding("IsBusy", source: this));
+            activityIndicatorStackLayout.SetBinding(StackLayout.IsVisibleProperty, new Binding("IsBusy", source: this));
 
 
 
@@ -43,6 +47,7 @@ namespace FollowYourSelfMobile.Views
                 }
             };
             mainListView.ItemTemplate = App.ActivityPageDataTemplate;
+            mainListView.SetBinding(ListView.ItemsSourceProperty, new Binding("activityList", source:typeof(App)));
             var mainGrid = new ExGrid();
             mainGrid.Children.Add(mainListView);
             mainGrid.Children.Add(activityIndicatorStackLayout);
