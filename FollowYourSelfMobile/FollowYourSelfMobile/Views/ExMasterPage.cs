@@ -18,20 +18,30 @@ namespace FollowYourSelfMobile.Views
 
         public async void ActivityPageGoster()
         {
+            this.IsPresented = false;
             this.Detail = new NavigationPage(new ActivityPage())
             {
-                BarBackgroundColor = Color.DarkRed
+                BarBackgroundColor = Color.DarkRed,
+                // BackgroundColor = Color.LightGray
             };
-            this.IsPresented = false;
         }
 
         public async void ActivityStatusPageGoster()
         {
+            this.IsPresented = false;
             this.Detail = new NavigationPage(new ActivityStatusPage())
             {
                 BarBackgroundColor = Color.DarkRed
             };
+        }
+
+        public async void ReportPageGoster()
+        {
             this.IsPresented = false;
+            this.Detail = new NavigationPage(new ReportPage())
+            {
+                BarBackgroundColor = Color.DarkRed
+            };
         }
     }
 }

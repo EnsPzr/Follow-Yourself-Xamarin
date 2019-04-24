@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -16,28 +18,38 @@ namespace FollowYourSelfMobile.Views
     public class ActivityStatusPage : ContentPage
     {
         private ExPicker[] exPickers;
-        private ExEntry[] exEntries;
+        private ExNumericEntry[] exEntries;
         private Dictionary<int, string> exPickersValue = new Dictionary<int, string>();
-        private ExStackLayout mainExStackLayout = new ExStackLayout()
-        {
-            Padding = new Thickness(0, 20, 0, 0)
-        };
+        private ExStackLayout mainExStackLayout = new ExStackLayout();
         private SQLiteManager _manager = new SQLiteManager();
+        private ExDatePicker datePicker = new ExDatePicker();
         public ActivityStatusPage()
         {
             try
             {
+                datePicker.DateSelected += async (sender, e) =>
+                {
+                    Device.BeginInvokeOnMainThread((async () => { await CreateDisplay(e.NewDate); }));
+                };
+                var mainGrid = new ExGrid();
                 exPickersValue.Add(0, "Yapılmadı");
                 exPickersValue.Add(1, "Yapıldı");
                 var scrollView = new ScrollView();
-
+                var bodyGrid = new ExGrid() { Padding = new Thickness(15, 15, 15, 15) };
                 this.Title = "Günlük Aktivite İlerlemelerim";
-                var mainGrid = new ExGrid() { Padding = new Thickness(15, 0, 15, 0) };
-                scrollView.Content = mainExStackLayout;
                 var activityIndicatorLabel = new ExLabel
                 {
-                    Text = "Günlük aktivite durumları getiriliyor..."
+                    Text = "Günlük aktivite durumları getiriliyor...",
+                    TextColor = Color.Black
                 };
+                var activityIndicatorExFrame = new ExFrame()
+                {
+                    CornerRadius = 10,
+                    VerticalOptions = LayoutOptions.CenterAndExpand,
+                    HorizontalOptions = LayoutOptions.Center,
+                    BackgroundColor = Color.LightGray
+                };
+
                 var activityIndicator = new ActivityIndicator()
                 {
                     Color = Color.DarkRed
@@ -48,16 +60,19 @@ namespace FollowYourSelfMobile.Views
                     VerticalOptions = LayoutOptions.Center,
                     HorizontalOptions = LayoutOptions.Center
                 };
-                activityIndicatorStackLayout.SetBinding(IsVisibleProperty, new Binding("IsBusy", source: this));
                 activityIndicatorStackLayout.Children.Add(activityIndicatorLabel);
                 activityIndicatorStackLayout.Children.Add(activityIndicator);
-
+                activityIndicatorExFrame.Content = activityIndicatorStackLayout;
+                activityIndicatorExFrame.SetBinding(Frame.IsVisibleProperty, new Binding("IsBusy", source: this));
+                bodyGrid.Children.Add(mainExStackLayout);
+                scrollView.Content = bodyGrid;
+                mainGrid.Children.Add(activityIndicatorExFrame);
                 mainGrid.Children.Add(scrollView);
-                mainGrid.Children.Add(activityIndicatorStackLayout);
-
                 Content = mainGrid;
-
-                CreateDisplay(DateTime.Today);
+                Device.BeginInvokeOnMainThread((async () =>
+                {
+                    await CreateDisplay(DateTime.Today);
+                }));
             }
             catch (Exception e)
             {
@@ -65,7 +80,11 @@ namespace FollowYourSelfMobile.Views
             }
         }
 
-        public async void CreateDisplay(DateTime? date)
+        protected override void OnAppearing()
+        {
+
+        }
+        public async Task CreateDisplay(DateTime? date)
         {
             try
             {
@@ -73,26 +92,35 @@ namespace FollowYourSelfMobile.Views
                 if (date > DateTime.Today)
                 {
                     await DisplayAlert("Hata", "Bugünün tarihinden ileri bir tarih giremezsiniz.", "Tamam");
-                    date=DateTime.Today;
+                    date = DateTime.Today;
                 }
                 var queryDate = new DateTime(date.Value.Year, date.Value.Month, date.Value.Day);
+                mainExStackLayout.IsVisible = false;
                 mainExStackLayout.Children.Clear();
-                var datePicker = new ExDatePicker()
-                {
-                    Date = queryDate,
-                    Format = "dd/MM/yyyy",
-                    VerticalOptions = LayoutOptions.Center
-                };
+                this.datePicker.Date = queryDate;
+                this.datePicker.Format = "dd/MM/yyyy";
+                this.datePicker.VerticalOptions = LayoutOptions.Center;
+                this.datePicker.MaximumDate = DateTime.Today;
+
+                //var datePicker = new ExDatePicker()
+                //{
+                //    Date = queryDate,
+                //    Format = "dd/MM/yyyy",
+                //    VerticalOptions = LayoutOptions.Center,
+                //    MaximumDate = DateTime.Today
+                //};
                 var dateLabel = new ExLabel()
                 {
                     Text = "Günü Seçiniz:",
+                    TextColor = Color.Blue,
+                    Margin = new Thickness(10, 0, 0, 0),
+                    // HorizontalTextAlignment = TextAlignment.Center,
                     VerticalTextAlignment = TextAlignment.Center
                 };
                 mainExStackLayout.Children.Add(dateLabel);
                 mainExStackLayout.Children.Add(datePicker);
-                datePicker.DateSelected += async (sender, e) => { CreateDisplay(e.NewDate); };
+
                 mainExStackLayout.Children.Add(datePicker);
-                mainExStackLayout.IsVisible = false;
                 var allActivities = _manager.GetAllActivity(date, true);
                 foreach (var activity in allActivities)
                 {
@@ -116,52 +144,67 @@ namespace FollowYourSelfMobile.Views
                         Enums.ActivityTypes.YapildiYapilmadi
                 }).ToList();
                 exPickers = new ExPicker[activityStatusList.Count(p => p.ActivityTypes == Enums.ActivityTypes.YapildiYapilmadi)];
-                exEntries = new ExEntry[activityStatusList.Count(p => p.ActivityTypes != Enums.ActivityTypes.YapildiYapilmadi)];
+                exEntries = new ExNumericEntry[activityStatusList.Count(p => p.ActivityTypes != Enums.ActivityTypes.YapildiYapilmadi)];
                 var exPickersCounter = 0;
                 var exEntryCellsCounter = 0;
                 var lst = new List<ViewCell>();
-                foreach (var activity in activityStatusList)
+                if (activityStatusList.Count > 0)
                 {
-                    if (activity.ActivityTypes == Enums.ActivityTypes.Sayi)
+                    var tabIndex = 0;
+                    foreach (var activity in activityStatusList)
                     {
-                        exEntries[exEntryCellsCounter] = new ExEntry()
+                        if (activity.ActivityTypes == Enums.ActivityTypes.Sayi)
                         {
-                            Keyboard = Keyboard.Numeric,
-                            Placeholder = activity.ActivityValue.ToString(),
-                            ReturnCommandParameter = activity.ActivityStatusId
-                        };
-                        mainExStackLayout.Children.Add(new ExLabel()
+                            exEntries[exEntryCellsCounter] = new ExNumericEntry()
+                            {
+                                Keyboard = Keyboard.Text,
+                                Placeholder = activity.ActivityValue.ToString(),
+                                ReturnCommandParameter = activity.ActivityStatusId,
+                                TabIndex = tabIndex,
+                                HorizontalTextAlignment = TextAlignment.Center,
+                            };
+                            mainExStackLayout.Children.Add(new ExLabel()
+                            {
+                                Text = activity.ActivityName,
+                                TextColor = Color.Blue,
+                                Margin = new Thickness(10, 0, 0, 0),
+                                //  HorizontalTextAlignment = TextAlignment.Center,
+                                VerticalTextAlignment = TextAlignment.Center,
+                            });
+                            mainExStackLayout.Children.Add(exEntries[exEntryCellsCounter]);
+                            exEntryCellsCounter++;
+                        }
+                        else
                         {
-                            VerticalTextAlignment = TextAlignment.Center,
-                            VerticalOptions = LayoutOptions.Center,
-                            Text = activity.ActivityName
-                        });
-                        mainExStackLayout.Children.Add(exEntries[exEntryCellsCounter]);
-                        exEntryCellsCounter++;
-                    }
-                    else
-                    {
-                        exPickers[exPickersCounter] = new ExPicker()
-                        {
-                            ItemsSource = exPickersValue.Values.ToList(),
-                            SelectedItem = exPickersValue.FirstOrDefault(p => p.Key == int.Parse(activity.ActivityValue.ToString())).Value,
-                            Title = "Durum Seçiniz",
-                            ClassId = activity.ActivityStatusId.ToString()
-                        };
-                        mainExStackLayout.Children.Add(new ExLabel()
-                        {
-                            VerticalTextAlignment = TextAlignment.Center,
-                            VerticalOptions = LayoutOptions.Center,
-                            Text = activity.ActivityName
-                        });
-                        mainExStackLayout.Children.Add(exPickers[exPickersCounter]);
-                        exPickersCounter++;
+                            exPickers[exPickersCounter] = new ExPicker()
+                            {
+                                ItemsSource = exPickersValue.Values.ToList(),
+                                SelectedItem = exPickersValue.FirstOrDefault(p => p.Key == int.Parse(activity.ActivityValue.ToString())).Value,
+                                Title = "Durum Seçiniz",
+                                ClassId = activity.ActivityStatusId.ToString(),
+                                TabIndex = tabIndex
+                            };
+                            mainExStackLayout.Children.Add(new ExLabel()
+                            {
+                                Text = activity.ActivityName,
+                                TextColor = Color.Blue,
+                                Margin = new Thickness(10, 0, 0, 0),
+                                // HorizontalTextAlignment = TextAlignment.Center,
+                                VerticalTextAlignment = TextAlignment.Center
+                            });
+                            mainExStackLayout.Children.Add(exPickers[exPickersCounter]);
+                            exPickersCounter++;
+                        }
+
+                        tabIndex++;
                     }
                 }
                 var saveButton = new Exbutton()
                 {
                     Text = "Kaydet",
-                    BackgroundColor = Color.GreenYellow,
+                    BackgroundColor = Color.FromHex("#449D44"),
+                    TextColor = Color.White,
+                    CornerRadius = 10,
                     VerticalOptions = LayoutOptions.Center
                 };
                 saveButton.Clicked += async (sender, e) =>
@@ -170,7 +213,13 @@ namespace FollowYourSelfMobile.Views
                     {
                         if (exEntry.Text != null)
                         {
-                            _manager.UpdateActivityStatus(int.Parse(exEntry.ReturnCommandParameter.ToString()), Convert.ToDouble(exEntry.Text));
+                            double value;
+                            if (double.TryParse(exEntry.Text, NumberStyles.Float,
+                                CultureInfo.InvariantCulture, out value))
+                            {
+                                _manager.UpdateActivityStatus(int.Parse(exEntry.ReturnCommandParameter.ToString()), value);
+                            }
+                            
                         }
                         //  DisplayAlert("Deneme", $"{Convert.ToDouble(exEntry.Text)} {exEntry.ReturnCommandParameter}", "a");
                     }
@@ -185,8 +234,9 @@ namespace FollowYourSelfMobile.Views
                     await DisplayAlert("Başarı", "Kayıt işlemi başarı ile tamamlandı.", "Tamam");
                 };
                 mainExStackLayout.Children.Add(saveButton);
-                Thread.Sleep(1000);
+                await Task.Delay(1000);
                 mainExStackLayout.IsVisible = true;
+                await Task.Delay(1380);
                 this.IsBusy = false;
             }
             catch (Exception e)
@@ -194,5 +244,6 @@ namespace FollowYourSelfMobile.Views
                 DisplayAlert("Hata", e.Message, "Tamam");
             }
         }
+
     }
 }

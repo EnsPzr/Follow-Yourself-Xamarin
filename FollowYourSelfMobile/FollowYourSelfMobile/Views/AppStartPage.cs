@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using FollowYourSelfMobile.Ex;
 using Xamarin.Forms;
 
@@ -10,6 +12,8 @@ namespace FollowYourSelfMobile.Views
     {
         public AppStartPage()
         {
+            NavigationPage.SetHasNavigationBar(this, false);
+            var mainAbsoluteLayout = new AbsoluteLayout();
             var mainStackLayout = new ExStackLayout()
             {
                 BackgroundColor = Color.AliceBlue,
@@ -25,12 +29,21 @@ namespace FollowYourSelfMobile.Views
                 TextColor = Color.DarkRed
             };
 
-            mainStackLayout.Children.Add(appNameLabel);
+            mainAbsoluteLayout.Children.Add(appNameLabel);
             //mainStackLayout.Children.Add(new ExEntry()
             //{
             //    Text = "asdsadasdsadsa"
             //});
-            Content = mainStackLayout;
+            AbsoluteLayout.SetLayoutFlags(mainStackLayout, AbsoluteLayoutFlags.PositionProportional);
+            AbsoluteLayout.SetLayoutBounds(mainStackLayout, new Rectangle(0.5, 0.5, AbsoluteLayout.AutoSize, AbsoluteLayout.AutoSize));
+
+            Content = mainAbsoluteLayout;
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            Application.Current.MainPage = (App.exMasterPage);
         }
     }
 }

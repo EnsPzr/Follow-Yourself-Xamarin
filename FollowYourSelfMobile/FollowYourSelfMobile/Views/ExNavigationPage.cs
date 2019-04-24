@@ -60,7 +60,8 @@ namespace FollowYourSelfMobile.Views
                 // BorderColor = Color.Black,
                 TextColor = Color.White,
                 BackgroundColor = Color.DeepSkyBlue,
-                Text = "Aktivitelerim"
+                Text = "Aktivitelerim",
+                CornerRadius = 10
             };
             activityButton.Clicked += async (sender, e) =>
             {
@@ -70,7 +71,8 @@ namespace FollowYourSelfMobile.Views
             {
                 TextColor = Color.White,
                 BackgroundColor = Color.DeepSkyBlue,
-                Text = "Günlük Takip"
+                Text = "Günlük Takip",
+                CornerRadius = 10
             };
             activityStatusButton.Clicked += async (sender, e) =>
             {
@@ -78,7 +80,17 @@ namespace FollowYourSelfMobile.Views
                 App.exMasterPage.ActivityStatusPageGoster();
             };
 
-
+            var reportButton= new Exbutton()
+            {
+                TextColor = Color.White,
+                BackgroundColor = Color.DeepSkyBlue,
+                Text = "Rapor",
+                CornerRadius = 10
+            };
+            reportButton.Clicked += async (sender, e) =>
+            {
+                App.exMasterPage.ReportPageGoster();
+            };
             var buttonStackLayout = new ExStackLayout()
             {
                 Padding = new Thickness(15, 15, 15, 0),
@@ -89,7 +101,7 @@ namespace FollowYourSelfMobile.Views
             };
             buttonStackLayout.Children.Add(activityButton);
             buttonStackLayout.Children.Add(activityStatusButton);
-
+            buttonStackLayout.Children.Add(reportButton);
             #endregion
 
 

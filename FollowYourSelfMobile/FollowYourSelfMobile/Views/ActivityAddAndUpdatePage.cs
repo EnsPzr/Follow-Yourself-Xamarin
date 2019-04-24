@@ -143,8 +143,9 @@ namespace FollowYourSelfMobile.Views
             var saveButton = new Exbutton()
             {
                 Text = "Kaydet",
-                BackgroundColor = Color.GreenYellow,
-                TextColor = Color.Black,
+                BackgroundColor = Color.FromHex("#449D44"),
+                TextColor = Color.White,
+                CornerRadius = 10,
                 HorizontalOptions = LayoutOptions.FillAndExpand
             };
             var saveButtonViewCell = new ViewCell

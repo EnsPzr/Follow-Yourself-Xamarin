@@ -21,7 +21,6 @@ namespace FollowYourSelfMobile
         public static string DbName = "FollowYourSelfDB.db3";
         public static ExMasterPage exMasterPage = new ExMasterPage();
         public static List<Activity> activityList;
-
         public static DataTemplate ActivityPageDataTemplate;
         public App()
         {
@@ -30,7 +29,7 @@ namespace FollowYourSelfMobile
             {
                 var textCell = new ExTextCell();
                 textCell.SetBinding(TextCell.TextProperty, new Binding("ActivityName"));
-                textCell.SetBinding(TextCell.DetailProperty, new Binding("IsActive",converter: new IsActiveConverter())); //converter eklenecek
+                textCell.SetBinding(TextCell.DetailProperty, new Binding("IsActive",converter: new IsActiveConverter()));
                 textCell.SetBinding(TextCell.CommandParameterProperty, new Binding("ActivityId"));
                 textCell.SetBinding(TextCell.CommandParameterProperty, new Binding("ActivityTypes"));
                 return textCell;
@@ -65,7 +64,7 @@ namespace FollowYourSelfMobile
             //{
             //    //_manager.InsertActivity(activity);
             //}
-            MainPage = (exMasterPage);
+            MainPage = exMasterPage;
 
         }
 
