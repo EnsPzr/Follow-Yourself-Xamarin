@@ -65,6 +65,13 @@ namespace FollowYourSelfMobile.Helpers
             return _sqLiteConnection.Table<Activity>().FirstOrDefault(p => p.ActivityId == id);
         }
 
+        public int GetActivityId(string activityName)
+        {
+            return _sqLiteConnection.Table<Activity>()
+                .FirstOrDefault(p => p.ActivityName.Equals(activityName)).ActivityId;
+        }
+
+
 
         public List<ActivityStatus> GetAllActivityStatuses(DateTime? date)
         {
@@ -103,6 +110,11 @@ namespace FollowYourSelfMobile.Helpers
                 _sqLiteConnection.Update(activityStatus);
             }
         }
-        
+
+        public int GetActivityStatusId(int activityId, DateTime? date)
+        {
+            return _sqLiteConnection.Table<ActivityStatus>().FirstOrDefault(p => p.ActivityId == activityId
+                                                                                 && p.Date == date).ActivityStatusId;
+        }
     }
 }

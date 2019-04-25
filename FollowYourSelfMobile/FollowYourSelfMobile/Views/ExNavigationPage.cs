@@ -9,7 +9,28 @@ namespace FollowYourSelfMobile.Views
 {
     public class ExNavigationPage : ContentPage
     {
-
+        private Exbutton activityButton = new Exbutton
+        {
+            // BorderColor = Color.Black,
+            TextColor = Color.White,
+            BackgroundColor = Color.DeepSkyBlue,
+            Text = "Aktivitelerim",
+            CornerRadius = 10
+        };
+        private Exbutton activityStatusButton = new Exbutton
+        {
+            TextColor = Color.White,
+            BackgroundColor = Color.DeepSkyBlue,
+            Text = "Günlük Takip",
+            CornerRadius = 10
+        };
+        private Exbutton reportButton = new Exbutton()
+        {
+            TextColor = Color.White,
+            BackgroundColor = Color.DeepSkyBlue,
+            Text = "Rapor",
+            CornerRadius = 10
+        };
         public ExNavigationPage()
         {
             this.Title = "Menü";
@@ -54,42 +75,20 @@ namespace FollowYourSelfMobile.Views
 
 
             #region buttons
-
-            var activityButton = new Exbutton
-            {
-                // BorderColor = Color.Black,
-                TextColor = Color.White,
-                BackgroundColor = Color.DeepSkyBlue,
-                Text = "Aktivitelerim",
-                CornerRadius = 10
-            };
             activityButton.Clicked += async (sender, e) =>
             {
-                App.exMasterPage.ActivityPageGoster();
+                App.exMasterPage.ActivityPageShow();
             };
-            var activityStatusButton = new Exbutton
-            {
-                TextColor = Color.White,
-                BackgroundColor = Color.DeepSkyBlue,
-                Text = "Günlük Takip",
-                CornerRadius = 10
-            };
+
             activityStatusButton.Clicked += async (sender, e) =>
             {
                 //await new ExMasterPage().Detail.Navigation.PushAsync(new ActivityStatusPage());
-                App.exMasterPage.ActivityStatusPageGoster();
+                App.exMasterPage.ActivityStatusPageShow();
             };
 
-            var reportButton= new Exbutton()
-            {
-                TextColor = Color.White,
-                BackgroundColor = Color.DeepSkyBlue,
-                Text = "Rapor",
-                CornerRadius = 10
-            };
             reportButton.Clicked += async (sender, e) =>
             {
-                App.exMasterPage.ReportPageGoster();
+                App.exMasterPage.ReportPageShow();
             };
             var buttonStackLayout = new ExStackLayout()
             {
@@ -120,6 +119,20 @@ namespace FollowYourSelfMobile.Views
 
 
             Content = mainStackLayout;
+        }
+
+        public void AllButtonDisabled()
+        {
+            this.activityButton.IsEnabled = false;
+            this.activityStatusButton.IsEnabled = false;
+            this.reportButton.IsEnabled = false;
+        }
+
+        public void AllButtonEnable()
+        {
+            this.activityButton.IsEnabled = true;
+            this.activityStatusButton.IsEnabled = true;
+            this.reportButton.IsEnabled = true;
         }
     }
 }

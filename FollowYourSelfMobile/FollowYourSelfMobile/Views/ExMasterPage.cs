@@ -9,14 +9,14 @@ namespace FollowYourSelfMobile.Views
     {
         public ExMasterPage()
         {
-            Master = new ExNavigationPage();
+            Master = App.exNavigationPage;
             Detail = new NavigationPage(new ActivityStatusPage())
             {
                 BarBackgroundColor = Color.DarkRed
             };
         }
 
-        public async void ActivityPageGoster()
+        public async void ActivityPageShow()
         {
             this.IsPresented = false;
             this.Detail = new NavigationPage(new ActivityPage())
@@ -26,7 +26,7 @@ namespace FollowYourSelfMobile.Views
             };
         }
 
-        public async void ActivityStatusPageGoster()
+        public async void ActivityStatusPageShow()
         {
             this.IsPresented = false;
             this.Detail = new NavigationPage(new ActivityStatusPage())
@@ -35,7 +35,7 @@ namespace FollowYourSelfMobile.Views
             };
         }
 
-        public async void ReportPageGoster()
+        public async void ReportPageShow()
         {
             this.IsPresented = false;
             this.Detail = new NavigationPage(new ReportPage())

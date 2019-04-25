@@ -19,6 +19,7 @@ namespace FollowYourSelfMobile
     {
         SQLiteManager _manager = new SQLiteManager();
         public static string DbName = "FollowYourSelfDB.db3";
+        public static ExNavigationPage exNavigationPage = new ExNavigationPage();
         public static ExMasterPage exMasterPage = new ExMasterPage();
         public static List<Activity> activityList;
         public static DataTemplate ActivityPageDataTemplate;
